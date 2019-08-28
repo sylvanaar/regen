@@ -2,7 +2,7 @@ local Regen = select(2, ...)
 local L = Regen.L
 
 L:AddLocale("enUS", {
-	NAME = "FuBar - RegenFu",
+	NAME = "Regen",
 	DESCRIPTION = "Show your HP/MP regen rate.",
 		
 	HP_LABEL = "HP: ";

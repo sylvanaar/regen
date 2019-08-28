@@ -11,6 +11,20 @@ local L = Regen.L
 
 -- addon = AceLibrary("AceAddon-2.0"):new("FuBarPlugin-2.0", "AceEvent-2.0", "AceConsole-2.0", "AceDB-2.0", "AceDebug-2.0", "CandyBar-2.0")
 
+local broker = {
+	type = "data source",
+	label = L.NAME,
+	text = ""
+	-- icon = "Interface\\Addons\\"..Prat.FolderLocation.."\\textures\\chat-bubble",
+	-- OnClick = function(frame, button)
+	-- 	Prat.ToggleOptionsWindow()
+	-- end,
+	-- OnTooltipShow = function(tooltip)
+	-- 	tooltip:AddLine(Prat.Version)
+	-- end,
+}
+
+
 function addon:Debug(...)
 	if addon.debug and Prat then
 		Prat:PrintLiteral(...)
@@ -24,6 +38,13 @@ end
 function addon:Update()
 	--- nop
 	self:Debug(self.vars)
+
+	self:OnDataUpdate()
+	self:OnTextUpdate()
+end
+
+function addon:SetText(text)
+	broker.text = text
 end
 
 function addon:StopCandyBar()
@@ -399,6 +420,7 @@ end
 
 addon.OnMenuRequest = addon.optionsTable
 
+
 	
 function addon:OnInitialize()
 	self:SetDebugging(self.db.profile.debug)
@@ -432,7 +454,9 @@ function addon:OnInitialize()
 	}
 	
 	self.data = {}
-	
+
+	LibStub:GetLibrary("LibDataBroker-1.1"):NewDataObject("Regen", broker)
+	self:Update()
 end
 
 function addon:OnEnable()

@@ -16,6 +16,7 @@
 <Include file="AceHook-3.0\AceHook-3.0.xml" />
 
 <Include file="LibSharedMedia-3.0\lib.xml"/>
+<Include file="LibQTip-1.0\LibQTip-1.0.lua"/>
 
 <Include file="LibSink-2.0\lib.xml"/>
 
