@@ -12,8 +12,8 @@ local L = Regen.L
 -- addon = AceLibrary("AceAddon-2.0"):new("FuBarPlugin-2.0", "AceEvent-2.0", "AceConsole-2.0", "AceDB-2.0", "AceDebug-2.0", "CandyBar-2.0")
 
 function addon:Debug(...)
-	if (addon.debug) then
-		print(...)
+	if addon.debug and Prat then
+		Prat:PrintLiteral(...)
 	end
 end
 
@@ -23,6 +23,7 @@ end
 
 function addon:Update()
 	--- nop
+	self:Debug(self.vars)
 end
 
 function addon:StopCandyBar()
@@ -30,6 +31,21 @@ function addon:StopCandyBar()
 end
 function addon:UnregisterCandyBar()
 	--- nop
+end
+function addon:RegisterCandyBar()
+	--- nop
+end
+function addon:SetCandyBarTexture()
+	--- nop
+end
+function addon:SetCandyBarPoint()
+	--- nop
+end
+function addon:SetCandyBarWidth()
+	--- nop
+end
+function addon:IsCandyBarRegistered()
+	return false
 end
 
 local addonFiveSec = {}
@@ -356,28 +372,28 @@ function addon:SetShowOtherFSRBar(val)
 end
 
 function addon:ShowFSRBar(val)
-	local n,l = L["FSR"], L["FSR"]
-	local c = "blue"
-	local a = 0.8
-	local t = barTextures["smooth"]
+	-- local n,l = L["FSR"], L["FSR"]
+	-- local c = "blue"
+	-- local a = 0.8
+	-- local t = barTextures["smooth"]
 
-	self.db.char.showFSRBar = val
+	-- self.db.char.showFSRBar = val
 	
-	if (val) then
-		self:RegisterCandyBar(n, 5, l, barIcon, c) 
-		self:SetCandyBarTexture(n, t)
-		bwf = self:GetFrame()
-		self:SetCandyBarWidth(n, bwf:GetWidth()) 
-		if bwf:GetBottom() > 0 then 
-			self:SetCandyBarPoint(n, "TOPLEFT", bwf, "BOTTOMLEFT")
-		else
-			self:SetCandyBarPoint(n, "BOTTOMLEFT", bwf, "TOPLEFT")
-		end
+	-- if (val) then
+	-- 	self:RegisterCandyBar(n, 5, l, barIcon, c) 
+	-- 	self:SetCandyBarTexture(n, t)
+	-- 	-- bwf = self:GetFrame()
+	-- 	self:SetCandyBarWidth(n, bwf:GetWidth()) 
+	-- 	if bwf:GetBottom() > 0 then 
+	-- 		self:SetCandyBarPoint(n, "TOPLEFT", bwf, "BOTTOMLEFT")
+	-- 	else
+	-- 		self:SetCandyBarPoint(n, "BOTTOMLEFT", bwf, "TOPLEFT")
+	-- 	end
 					
-	else
-		self:StopCandyBar(n)
-		self:UnregisterCandyBar(n)
-	end 	
+	-- else
+	-- 	self:StopCandyBar(n)
+	-- 	self:UnregisterCandyBar(n)
+	-- end 	
 end
 
 
@@ -420,8 +436,7 @@ function addon:OnInitialize()
 end
 
 function addon:OnEnable()
-	self:RegisterEvent("UNIT_HEALTH");
-	self:RegisterEvent("UNIT_MANA");
+	self:RegisterEvent("UNIT_POWER_UPDATE");
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("PLAYER_REGEN_DISABLED");
 	self:RegisterEvent("PLAYER_REGEN_ENABLED");
@@ -493,6 +508,15 @@ function addon:PLAYER_REGEN_ENABLED()
 	self:Update()
 end
 
+function addon:UNIT_POWER_UPDATE(_, unit, type)
+	self:Debug("UNIT_POWER_UPDATE - "..unit.." "..type)
+	if type == "MANA" then 
+		self:UNIT_MANA(unit)
+	elseif type == "HEALTH" then
+		self:UNIT_HEALTH(unit)
+	end  
+end
+
 function addon:UNIT_HEALTH()
 	if self:IsShowHP() then
 		local currHealth = UnitHealth("player");
@@ -520,6 +544,7 @@ local function UnitMana(unit)
 end
 
 function addon:UNIT_MANA(unit)
+	self:Debug("UNIT_MANA - "..unit)
 	if ( unit == "player" ) and ( UnitPowerType("player") == 0 ) then
 		if self:IsShowMP() or self:IsShowFSRT() then
 			local currMana = UnitMana("player");
