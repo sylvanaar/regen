@@ -1,0 +1,18 @@
+## Interface: 11302
+
+## X-Curse-Project-ID: 338912
+
+## Title: Regen 
+## Notes: A tool for tracking regen (mana and hp)
+## Version: @project-version@
+## Author: Sylvanaar (Sylvaann - Proudmoore/US-Alliance)
+## eMail: sylvanaar@mindspring.com
+
+## OptionalDeps: LibSink-2.0, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibDataBroker-1.1, LibDBIcon-1.0, LibAlts-1.0, LibChatAnims
+
+## DefaultState: Enabled
+## SavedVariables: RegenDB, RegenFSRDB
+## SavedVariablesPerCharacter: RegenPerCharDB
+
+LibDataBroker-1.1/LibDataBroker-1.1.lua
+addon.lua
