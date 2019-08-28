@@ -1,6 +1,8 @@
 local Regen = select(2, ...)
 
-local addon = LibStub("AceAddon-3.0"):NewAddon("Regen", "AceConsole-3.0", "AceTimer-3.0", "AceHook-3.0")
+local addon = LibStub("AceAddon-3.0"):NewAddon("Regen", "AceConsole-3.0", "AceTimer-3.0", "AceHook-3.0", "AceEvent-3.0")
+
+
 
 local L = Regen.L
 
@@ -8,6 +10,34 @@ local L = Regen.L
 -- local tablet = AceLibrary("Tablet-2.0")
 
 -- addon = AceLibrary("AceAddon-2.0"):new("FuBarPlugin-2.0", "AceEvent-2.0", "AceConsole-2.0", "AceDB-2.0", "AceDebug-2.0", "CandyBar-2.0")
+
+function addon:Debug(...)
+	if (addon.debug) then
+		print(...)
+	end
+end
+
+function addon:SetDebugging(val) 
+	addon.debug = val
+end
+
+function addon:Update()
+	--- nop
+end
+
+function addon:StopCandyBar()
+	--- nop
+end
+function addon:UnregisterCandyBar()
+	--- nop
+end
+
+local addonFiveSec = {}
+
+function addonFiveSec:ToggleActive()
+	--- nop
+end
+
 
 
 local barTextures = { smooth = "Interface\\Addons\\FuBar_addon\\Textures\\smooth.tga" }
@@ -171,26 +201,24 @@ addon.optionsTable = {
 	},	
 }
 
-
-addon:RegisterDB("FuBar_RegenDB", "FuBar_RegenPerCharDB")
-addon:RegisterDefaults('char', {
-    mpi = 1.0/15,
-    icr = 0,    
-    showOtherFSRBar = false,
-})
-addon:RegisterDefaults('class', {
-    mps = 0.0,
-})
-addon:RegisterDefaults('profile', {  
-	showHP = true,
-    showCurrent = false,
-    showPercent = false, 
-    showFightRegen = false, 
-    hideLabel = false, 
-})
-
-
-
+addon.db = LibStub("AceDB-3.0"):New("RegenDB", {  
+	profile = {
+		showHP = true,
+		showCurrent = false,
+		showPercent = false, 
+		showFightRegen = false, 
+		hideLabel = false,
+		debug = true
+	},
+	char = {
+		mpi = 1.0/15,
+		icr = 0,    
+		showOtherFSRBar = false,
+	},
+	class = {
+		mps = 0.0,
+	} 
+}, true)
 
 	-- Methods
 function addon:IsShowHP()
@@ -359,7 +387,7 @@ addon.OnMenuRequest = addon.optionsTable
 function addon:OnInitialize()
 	self:SetDebugging(self.db.profile.debug)
 	
-	self:RegisterChatCommand( L["AceConsole-commands"], addon.optionsTable )
+	-- self:RegisterChatCommand( L["AceConsole-commands"], addon.optionsTable )
 	
 
 
@@ -402,12 +430,12 @@ function addon:OnEnable()
 	self:Setup()
 	self:ShowFSRBar(self.db.char.showFSRBar)
 	self:SetShowOtherFSRBar(self.db.char.showOtherFSRBar)
-    self.vars.secondEventID = self:ScheduleRepeatingEvent(self.OnUpdateInternal, 0.5, self)
+    self.vars.secondEventID = self:ScheduleRepeatingTimer("OnUpdateInternal", 0.5)
 end
 
 function addon:OnDisable()
 	addonFiveSec:ToggleActive(false)
-    self:CancelScheduledEvent(self.vars.secondEventID)
+    self:CancelTimer(self.vars.secondEventID)
 end    
     
 		
@@ -418,6 +446,10 @@ function addon:PLAYER_ENTERING_WORLD()
 	self:Update()
 end
 	
+local function UnitManaMax(unit)
+	return UnitPowerMax(unit, UnitPowerType("MANA"))
+end
+
 function addon:Setup()
 	local _, class = UnitClass("player");
 	self:Debug("Setup() - "..class)
@@ -481,6 +513,10 @@ function addon:UNIT_HEALTH()
 		self.vars.currHealth = currHealth;
 		self:Update();
 	end
+end
+
+local function UnitMana(unit)
+	return UnitPower(unit, UnitPowerType("MANA"))
 end
 
 function addon:UNIT_MANA(unit)
