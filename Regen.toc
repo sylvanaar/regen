@@ -14,5 +14,5 @@
 ## SavedVariables: RegenDB, RegenFSRDB
 ## SavedVariablesPerCharacter: RegenPerCharDB
 
-LibDataBroker-1.1/LibDataBroker-1.1.lua
+libraries/includes.xml
 addon.lua
