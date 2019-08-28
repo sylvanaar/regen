@@ -14,9 +14,9 @@
 ## SavedVariables: RegenDB, RegenFSRDB
 ## SavedVariablesPerCharacter: RegenPerCharDB
 
-libraries/includes.xml
+libraries\includes.xml
 locale.lua
 
-localizations/en-US.lua
+localizations\en-US.lua
 
 addon.lua
