@@ -11,19 +11,36 @@ local L = Regen.L
 
 -- addon = AceLibrary("AceAddon-2.0"):new("FuBarPlugin-2.0", "AceEvent-2.0", "AceConsole-2.0", "AceDB-2.0", "AceDebug-2.0", "CandyBar-2.0")
 
+
+local LibQTip = LibStub('LibQTip-1.0')
+
 local broker = {
 	type = "data source",
 	label = L.NAME,
-	text = ""
+	text = "",
 	-- icon = "Interface\\Addons\\"..Prat.FolderLocation.."\\textures\\chat-bubble",
 	-- OnClick = function(frame, button)
 	-- 	Prat.ToggleOptionsWindow()
 	-- end,
-	OnTooltipShow = function(tooltip)
-		addon:DemoTooltip()
+	OnEnter = function(frame) 
+		local tooltip = LibQTip:Acquire("RegenTooltip", 2, "LEFT", "RIGHT")
+		addon.tooltip = tooltip 
+
+		local headerFont = CreateFont("RegenHeaderFont")
+		headerFont:SetFont(GameTooltipText:GetFont(), 15)
+		headerFont:SetTextColor(1,1,0)
+
+		tooltip:SetHeaderFont(headerFont)
+
+		addon:UpdateTooltip(tooltip)
+		tooltip:SmartAnchorTo(frame)
+		tooltip:Show()
+	end,
+	OnLeave = function(frame)
+		LibQTip:Release(addon.tooltip)
+		addon.tooltip = nil 
 	end,
 }
-
 
 function addon:Debug(...)
 	if addon.debug and Prat then
@@ -41,6 +58,9 @@ function addon:Update()
 
 	self:OnDataUpdate()
 	self:OnTextUpdate()
+	if addon.tooltip then
+		self:UpdateTooltip(self.tooltip)
+	end
 end
 
 function addon:SetText(text)
@@ -93,23 +113,7 @@ end
    
 --  end
 
-function addon:DemoTooltip()
-   -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
-   local tooltip = LibQTip:Acquire("FooBarTooltip", 3, "LEFT", "CENTER", "RIGHT")
-   self.tooltip = tooltip 
-   
-   -- Add an header filling only the first two columns
-   tooltip:AddHeader('Anchor', 'Tooltip')
-   
-   -- Add an new line, using all columns
-   tooltip:AddLine('Hello', 'World', '!')
-   
-   -- Use smart anchoring code to anchor the tooltip to our frame
-   tooltip:SmartAnchorTo(self)
-   
-   -- Show it, et voilà !
-   tooltip:Show()
-end
+
 
 local barTextures = { smooth = "Interface\\Addons\\FuBar_addon\\Textures\\smooth.tga" }
 local barIcon = "Interface\\Addons\\FuBar_addon\\Textures\\5.tga"
@@ -279,7 +283,7 @@ addon.db = LibStub("AceDB-3.0"):New("RegenDB", {
 		showPercent = false, 
 		showFightRegen = false, 
 		hideLabel = false,
-		debug = true
+		-- debug = true
 	},
 	char = {
 		mpi = 1.0/15,
@@ -795,106 +799,63 @@ function addon:OnTextUpdate()
 	end	
 end
 	
-function addon:OnTooltipUpdate()
-	local cat
-	
-	if self:IsShowHP() then
-		cat = tablet:AddCategory(
-			'columns', 2,
-			'child_textR', 1,
-			'child_textG', 1,
-			'child_textB', 0,
-			'child_text2R', 0,
-			'child_text2G', 1,
-			'child_text2B', 0
-		);
 
-		cat:AddLine(
-			'text', L.TOOLTIP1_LEFT, 
-			'text2', string.format("%s |cffffffff/|r %s |cffffffff(|r|cffff0000%s|cffffffff)|r", 
+function addon:UpdateTooltip(tooltip)
+	tooltip:Clear()
+
+	if self:IsShowHP() then
+		tooltip:AddHeader(
+			L.TOOLTIP1_LEFT, 
+			string.format("%s |cffffffff/|r %s |cffffffff(|r|cffff0000%s|cffffffff)|r", 
                self.data.playerHP, self.data.playerMaxHP, self.data.playerMaxHP-self.data.playerHP )
 		);
-	   local cat_ratiosH = cat:AddCategory(
-			'columns', 2,
-			'child_textR', 0.60,
-			'child_textG', 0.60,
-			'child_textB', 0,
-			'child_text2R', 0,
-			'child_text2G', 1,
-			'child_text2B', 0,
-			'hideBlankLine', true,
-			'child_indentation', 10
-        )
 
-		cat_ratiosH:AddLine(
-			'text', L.TOOLTIP3_LEFT, 
-			'text2', self.data.maxHPRate
+		tooltip:AddLine(
+			L.TOOLTIP3_LEFT, 
+			self.data.maxHPRate
 		);
-		cat_ratiosH:AddLine(
-			'text', L.TOOLTIP4_LEFT, 
-			'text2', self.data.minHPRate
+		tooltip:AddLine(
+			L.TOOLTIP4_LEFT, 
+			self.data.minHPRate
 		);
-		cat_ratiosH:AddLine(
-			'text', L.TOOLTIP8_LEFT, 
-			'text2', string.format("%s (%.2f%%)", 
+		tooltip:AddLine(
+			L.TOOLTIP8_LEFT, 
+			string.format("%s (%.2f%%)", 
                 self.data.regenHPCombat, self.data.regenHPPercentCombat )
 		);			
 	end
 	
 	if self:IsShowMP() then
-		cat = tablet:AddCategory(
-			'columns', 2,
-			'child_textR', 1,
-			'child_textG', 1,
-			'child_textB', 0,
-			'child_text2R', 0.2,
-			'child_text2G', 0.4,
-			'child_text2B', 1
-		);
-
-		cat:AddLine(
-			'text', L.TOOLTIP2_LEFT, 
-			'text2', string.format("%s |cffffffff/|r %s |cffffffff(|r|cffff0000%s|cffffffff)|r", 
+		tooltip:AddHeader(
+			L.TOOLTIP2_LEFT, 
+			string.format("%s |cffffffff/|r %s |cffffffff(|r|cffff0000%s|cffffffff)|r", 
                  self.data.playerMP, self.data.playerMaxMP, self.data.playerMaxMP-self.data.playerMP)
 		);
 		
-	   local cat_ratiosM = cat:AddCategory(
-			'columns', 2,
-			'child_textR', 0.60,
-			'child_textG', 0.60,
-			'child_textB', 0,
-			'child_text2R', 0.2,
-			'child_text2G', 0.4,
-			'child_text2B', 1,
-			'hideBlankLine', true,
-			'child_indentation', 10
-        )
-			cat_ratiosM:AddLine(
-				'text', L.TOOLTIP5_LEFT, 
-				'text2', self.data.maxMPRate
-			);
-			cat_ratiosM:AddLine(
-				'text', L.TOOLTIP6_LEFT, 
-				'text2', self.data.minMPRate
-			);
-			cat_ratiosM:AddLine(
-				'text', L.TOOLTIP7_LEFT, 
-				'text2', string.format("%s (%.2f%%)", 
-	                 self.data.regenMPCombat, self.data.regenMPPercentCombat)
-			);
-			cat_ratiosM:AddLine(
-				'text', L.TOOLTIP9_LEFT, 
-				'text2', string.format("%s MP/5s", 
-	                 self:GetCombatDuration() > 0 and math.floor((self.data.regenMPCombat/self:GetCombatDuration())*5) or 0)
-			);
-				
+		tooltip:AddLine(
+			L.TOOLTIP5_LEFT, 
+			self.data.maxMPRate
+		);
+		tooltip:AddLine(
+			L.TOOLTIP6_LEFT, 
+			self.data.minMPRate
+		);
+		tooltip:AddLine(
+			L.TOOLTIP7_LEFT, 
+			string.format("%s (%.2f%%)", 
+					self.data.regenMPCombat, self.data.regenMPPercentCombat)
+		);
+		tooltip:AddLine(
+			L.TOOLTIP9_LEFT, 
+			string.format("%s MP/5s", 
+					self:GetCombatDuration() > 0 and math.floor((self.data.regenMPCombat/self:GetCombatDuration())*5) or 0)
+		);
 	end		
     
 	if self:IsShowFSRT() then
 --		usedMPDuringCombat = 0,
 --        combatDuration = 0,
 --        timeInFSR = 0,
-
         
         local fsrp = self.data.fsrpLast
         local str = string.format("%0.2f", 2/(5*self.db.class.mps*(1 - fsrp + self.db.char.icr*fsrp)));
@@ -910,90 +871,50 @@ function addon:OnTooltipUpdate()
         	timeFormat = self:FormatDurationString(self.data.combatDurationLast)   	
         end
         
-        local cat = tablet:AddCategory(
-			'columns', 2,
-			'child_textR', 1,
-			'child_textG', 1,
-			'child_textB', 0,
-			'child_text2R', 0.2,
-			'child_text2G', 0.4,
-			'child_text2B', 1
-        )
-        cat:AddLine(
-            'text', L["Time Spent In Regen"].." "..combatTag,
-            'text2', timeFormat
+        tooltip:AddHeader(
+            L["Time Spent In Regen"].." "..combatTag,
+            timeFormat
         )
         
-	        local cat_ratios = cat:AddCategory(
-				'columns', 2,
-				'child_textR', 0.60,
-				'child_textG', 0.60,
-				'child_textB', 0,
-				'child_text2R', 0.2,
-				'child_text2G', 0.4,
-				'child_text2B', 1,
-				'hideBlankLine', true,
-				'child_indentation', 10
-	        )
-	        cat_ratios:AddLine(
-	            'text', L["% Of That Time In FSR"], 
-	            'text2', string.format("%0.1f%%", fsrp*100)
-	        )
-	        cat_ratios:AddLine(
-	            'text', L["Spirit Needed To Equal 1mp5"], 
-	            'text2', str
-	        )
-	        cat_ratios:AddLine(
-	            'text', L["Int Needed To Equal 1mp5"], 
-	            'text2', string.format("%0.2f", self.data.combatDurationLast/5*self.db.char.mpi)
-	        )
-		
+		tooltip:AddLine(
+			L["% Of That Time In FSR"], 
+			string.format("%0.1f%%", fsrp*100)
+		)
+		tooltip:AddLine(
+			L["Spirit Needed To Equal 1mp5"], 
+			str
+		)
+		tooltip:AddLine(
+			L["Int Needed To Equal 1mp5"], 
+			string.format("%0.2f", self.data.combatDurationLast/5*self.db.char.mpi)
+		)
 
  		fsrp = self.data.fsrpTotal
         str = string.format("%0.2f", 2/(5*self.db.class.mps*(1 - fsrp + self.db.char.icr*fsrp)));
  		
-        local cat2 = tablet:AddCategory(
-		'columns', 2,
-		'child_textR', 1,
-		'child_textG', 1,
-		'child_textB', 0,
-		'child_text2R', 0.2,
-		'child_text2G', 0.4,
-		'child_text2B', 1
+        tooltip:AddHeader(
+            L["Total Regen Time Observed"],
+            self:FormatDurationString(self.data.combatDurationTotal)
         )
-        cat2:AddLine(
-            'text', L["Total Regen Time Observed"],
-            'text2', self:FormatDurationString(self.data.combatDurationTotal)
+        tooltip:AddLine(
+            L["% Of That Time In FSR"], 
+            string.format("%0.1f%%", fsrp*100)
         )
-		local cat_ratios2 = cat2:AddCategory(
-				'columns', 2,
-				'child_textR', 0.60,
-				'child_textG', 0.60,
-				'child_textB', 0,
-				'child_text2R', 0.2,
-				'child_text2G', 0.4,
-				'child_text2B', 1,
-				'hideBlankLine', true,
-				'child_indentation', 10
-	    )        
-        cat_ratios2:AddLine(
-            'text', L["% Of That Time In FSR"], 
-            'text2', string.format("%0.1f%%", fsrp*100)
-        )
-        cat_ratios2:AddLine(
-            'text', L["Spirit Needed To Equal 1mp5"], 
-            'text2', str
+        tooltip:AddLine(
+            L["Spirit Needed To Equal 1mp5"], 
+            str
         )
     end
     
-    if addonFiveSec and addonFiveSec:IsActive() then 
-	    tablet:SetHint(L["|cffeda55fShift-Click|r to lock/unlock the movable 5-second bar"])    
-	else
-	   -- tablet:SetHint("")    
-	end	
+    -- if addonFiveSec and addonFiveSec:IsActive() then 
+	--     tablet:AddLine(L["|cffeda55fShift-Click|r to lock/unlock the movable 5-second bar"])    
+	-- else
+	--    -- tablet:SetHint("")    
+	-- end	
+
+
 end
-	
-	
+
 function addon:FormatDurationString(duration)
 	return string.format("%d:%04.1f" , floor(duration/60), floor(mod(duration*10, 600))/10)
 end
