@@ -1,12 +1,11 @@
-local addon = LibStub("AceAddon-3.0"):NewAddon("Prat", "AceConsole-3.0", "AceTimer-3.0", "AceHook-3.0")
+local Regen = select(2, ...)
 
+local addon = LibStub("AceAddon-3.0"):NewAddon("Regen", "AceConsole-3.0", "AceTimer-3.0", "AceHook-3.0")
 
-
+local L = Regen.L
 
 -- local dewdrop = AceLibrary("Dewdrop-2.0")
 -- local tablet = AceLibrary("Tablet-2.0")
--- local L = AceLibrary("AceLocale-2.2"):new("addon")
-
 
 -- addon = AceLibrary("AceAddon-2.0"):new("FuBarPlugin-2.0", "AceEvent-2.0", "AceConsole-2.0", "AceDB-2.0", "AceDebug-2.0", "CandyBar-2.0")
 

@@ -15,4 +15,8 @@
 ## SavedVariablesPerCharacter: RegenPerCharDB
 
 libraries/includes.xml
+locale.lua
+
+localizations/en-US.lua
+
 addon.lua
