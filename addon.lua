@@ -19,9 +19,9 @@ local broker = {
 	-- OnClick = function(frame, button)
 	-- 	Prat.ToggleOptionsWindow()
 	-- end,
-	-- OnTooltipShow = function(tooltip)
-	-- 	tooltip:AddLine(Prat.Version)
-	-- end,
+	OnTooltipShow = function(tooltip)
+		addon:DemoTooltip()
+	end,
 }
 
 
@@ -76,6 +76,40 @@ function addonFiveSec:ToggleActive()
 end
 
 
+ -- Get a reference to the lib
+ local LibQTip = LibStub('LibQTip-1.0')
+ 
+--  local function anchor_OnEnter(self)
+   
+
+   
+--  end
+ 
+--  local function anchor_OnLeave(self)
+   
+--    -- Release the tooltip
+--    LibQTip:Release(self.tooltip)
+--    self.tooltip = nil
+   
+--  end
+
+function addon:DemoTooltip()
+   -- Acquire a tooltip with 3 columns, respectively aligned to left, center and right
+   local tooltip = LibQTip:Acquire("FooBarTooltip", 3, "LEFT", "CENTER", "RIGHT")
+   self.tooltip = tooltip 
+   
+   -- Add an header filling only the first two columns
+   tooltip:AddHeader('Anchor', 'Tooltip')
+   
+   -- Add an new line, using all columns
+   tooltip:AddLine('Hello', 'World', '!')
+   
+   -- Use smart anchoring code to anchor the tooltip to our frame
+   tooltip:SmartAnchorTo(self)
+   
+   -- Show it, et voilà !
+   tooltip:Show()
+end
 
 local barTextures = { smooth = "Interface\\Addons\\FuBar_addon\\Textures\\smooth.tga" }
 local barIcon = "Interface\\Addons\\FuBar_addon\\Textures\\5.tga"
