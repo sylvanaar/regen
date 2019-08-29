@@ -3,7 +3,7 @@
 # regen
 Mana Regeneration Information Addon
 
-[Tooltip Image](https://imgur.com/tmUYKw0)
+![Tooltip Image](https://i.imgur.com/tmUYKw0.jpg)
 
 Shows your HP/MP regen rate, and tracks mana regen 5 second rule statistics. 
 
