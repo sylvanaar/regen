@@ -130,6 +130,7 @@ addon.optionsTable = {
 			desc = L["MENU_SHOW_HP"],
 			set = "ToggleShowHP",
 			get = "IsShowHP",
+			handler = addon
 		},
 		showMP = {
 			order = 2,
@@ -138,6 +139,7 @@ addon.optionsTable = {
 			desc = L["MENU_SHOW_MP"],
 			set = "ToggleShowMP",
 			get = "IsShowMP",
+			handler = addon
 		},
 		showFSRT = {
 			order = 3,
@@ -146,11 +148,9 @@ addon.optionsTable = {
 			desc = L["Show FSRT"],
 			set = "ToggleShowFSRT",
 			get = "IsShowFSRT",
+			handler = addon
 		},        
-		fsrtGroup1 = {
-			type = 'header',
-			order = 10,
-		},
+
 		showPercent = {
 			order = 11,
 			type = 'toggle',
@@ -158,6 +158,7 @@ addon.optionsTable = {
 			desc = L["MENU_SHOW_PERCENT"],
 			set = "ToggleShowPercent",
 			get = "IsShowPercent",
+			handler = addon
 		},
 		showCurrent = {
 			order = 12,
@@ -166,6 +167,7 @@ addon.optionsTable = {
 			desc = L["MENU_SHOW_CURRENT"],
 			set = "ToggleShowCurrent",
 			get = "IsShowCurrent",
+			handler = addon
 		},
 		showFightRegen = {
 			order = 13,
@@ -174,6 +176,7 @@ addon.optionsTable = {
 			desc = L["Show In Combat Regen Total"],
 			set = "ToggleShowFightRegen",
 			get = "IsShowFightRegen",
+			handler = addon
 		},
 
 		hideLabel = {
@@ -183,11 +186,7 @@ addon.optionsTable = {
 			desc = L["MENU_HIDE_LABEL"],
 			set = "ToggleHideLabel",
 			get = "IsHideLabel",
-		},
-		fsrtGroup2 = {
-			type = 'header',
-			order = 20,
-			hidden = "IsHideFSRT",			
+			handler = addon
 		},
 
 		icr = {
@@ -202,6 +201,7 @@ addon.optionsTable = {
 		    isPercent = true,
    			order = 21,
 			hidden = "IsHideFSRT",   			
+			handler = addon
 		},
 
 		mps = {
@@ -215,13 +215,16 @@ addon.optionsTable = {
 		    step = 0.5, 
 			order = 22,
 			hidden = "IsHideFSRT",
+			handler = addon
 		},
 
 		mpi = {
-			type = "text",
-			usage = "<number>",
+			type = "range",
 			name = L["Mana Per Int"],
 			desc = L["Mana Per Int"],
+			min = 10,
+			max = 20, 
+			step = 1,
 			get  = "GetMPI",
 			set  = "SetMPI",
 			validate = function(v)
@@ -229,15 +232,9 @@ addon.optionsTable = {
     		end,
 			order = 23,
 			hidden = "IsHideFSRT",
+			handler = addon
 		},
 
-		fsrtGroup3 = {
-			type = 'header',
-			order = 30,
-			hidden = "IsHideFSRT",			
-		},
-		
-		
 		showFSRB = {
 			type = "toggle",
 			name = L["FSR Countdown Bar"],
@@ -246,6 +243,7 @@ addon.optionsTable = {
 			get = function() return addon.db.char.showFSRBar end,
 			order = 31,
 			hidden = "IsHideFSRT",
+			handler = addon
 		},
 		showOtherFSRB = {
 			type = "toggle",
@@ -255,15 +253,8 @@ addon.optionsTable = {
 			get = function() return addon.db.char.showOtherFSRBar end,
 			order = 32,
 			hidden = "IsHideFSRT",
+			handler = addon
 		},		
-		
-
-		fsrtGroup4 = {
-			type = 'header',
-			order = 40,
-			hidden = "IsHideFSRT",			
-		},
-		
 		
 		reset = {
 			type = "execute",
@@ -272,6 +263,7 @@ addon.optionsTable = {
 			func = "ResetFSRT",
 			order = 41,
 			hidden = "IsHideFSRT",
+			handler = addon
 		},
 	},	
 }
@@ -464,7 +456,11 @@ function addon:OnInitialize()
 	self:SetDebugging(self.db.profile.debug)
 	
 	-- self:RegisterChatCommand( L["AceConsole-commands"], addon.optionsTable )
-	
+	local acreg = LibStub("AceConfigRegistry-3.0")
+	acreg:RegisterOptionsTable(L.NAME, addon.optionsTable)
+  
+	local acdia = LibStub("AceConfigDialog-3.0")
+	acdia:AddToBlizOptions(L.NAME, L.NAME)
 
 
 	self.vars = {

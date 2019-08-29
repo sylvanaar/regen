@@ -1,6 +1,7 @@
 ## Interface: 11302
 
 ## X-Curse-Project-ID: 338912
+## X-WoWI-ID: 25198
 
 ## Title: Regen 
 ## Notes: A tool for tracking regen (mana and hp)
