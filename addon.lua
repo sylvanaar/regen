@@ -1,27 +1,21 @@
 local Regen = select(2, ...)
 
+
+--@debug@ 
+_G.regen = Regen
+--@end-debug@  
+
 local addon = LibStub("AceAddon-3.0"):NewAddon("Regen", "AceConsole-3.0", "AceTimer-3.0", "AceHook-3.0", "AceEvent-3.0")
-
-
 
 local L = Regen.L
 
--- local dewdrop = AceLibrary("Dewdrop-2.0")
--- local tablet = AceLibrary("Tablet-2.0")
-
--- addon = AceLibrary("AceAddon-2.0"):new("FuBarPlugin-2.0", "AceEvent-2.0", "AceConsole-2.0", "AceDB-2.0", "AceDebug-2.0", "CandyBar-2.0")
-
-
 local LibQTip = LibStub('LibQTip-1.0')
+local candybar = LibStub("LibCandyBar-3.0")
 
 local broker = {
 	type = "data source",
 	label = L.NAME,
 	text = "",
-	-- icon = "Interface\\Addons\\"..Prat.FolderLocation.."\\textures\\chat-bubble",
-	-- OnClick = function(frame, button)
-	-- 	Prat.ToggleOptionsWindow()
-	-- end,
 	OnEnter = function(frame) 
 		local tooltip = LibQTip:Acquire("RegenTooltip", 2, "LEFT", "RIGHT")
 		addon.tooltip = tooltip 
@@ -40,6 +34,9 @@ local broker = {
 		LibQTip:Release(addon.tooltip)
 		addon.tooltip = nil 
 	end,
+	OnClick = function(clickedframe, button)
+		Regen.FSRBar:ToggleLock()
+	end
 }
 
 function addon:Debug(...)
@@ -54,7 +51,7 @@ end
 
 function addon:Update()
 	--- nop
-	self:Debug(self.vars)
+	-- self:Debug(self.vars)
 
 	self:OnDataUpdate()
 	self:OnTextUpdate()
@@ -63,60 +60,29 @@ function addon:Update()
 	end
 end
 
+
+local function barstopped( callback, bar )
+	if addon.bar == bar then
+		addon:Debug("Destroying FSRBar")
+		addon.bar = nil
+	end
+end
+  
+candybar.RegisterCallback(addon, "LibCandyBar_Stop", barstopped)
+
 function addon:SetText(text)
 	broker.text = text
 end
 
-function addon:StopCandyBar()
-	--- nop
-end
-function addon:UnregisterCandyBar()
-	--- nop
-end
-function addon:RegisterCandyBar()
-	--- nop
-end
-function addon:SetCandyBarTexture()
-	--- nop
-end
-function addon:SetCandyBarPoint()
-	--- nop
-end
-function addon:SetCandyBarWidth()
-	--- nop
-end
-function addon:IsCandyBarRegistered()
-	return false
-end
 
-local addonFiveSec = {}
 
-function addonFiveSec:ToggleActive()
-	--- nop
-end
-
+local addonFiveSec = Regen.FSRBar
 
  -- Get a reference to the lib
- local LibQTip = LibStub('LibQTip-1.0')
+local LibQTip = LibStub('LibQTip-1.0')
  
---  local function anchor_OnEnter(self)
-   
-
-   
---  end
- 
---  local function anchor_OnLeave(self)
-   
---    -- Release the tooltip
---    LibQTip:Release(self.tooltip)
---    self.tooltip = nil
-   
---  end
-
-
-
-local barTextures = { smooth = "Interface\\Addons\\FuBar_addon\\Textures\\smooth.tga" }
-local barIcon = "Interface\\Addons\\FuBar_addon\\Textures\\5.tga"
+local barTextures = { smooth = "Interface\\Addons\\Regen\\textures\\smooth.tga" }
+local barIcon = "Interface\\Addons\\Regen\\textures\\5.tga"
 
 addon.hasIcon = barIcon
 
@@ -235,16 +201,16 @@ addon.optionsTable = {
 			handler = addon
 		},
 
-		showFSRB = {
-			type = "toggle",
-			name = L["FSR Countdown Bar"],
-			desc = L["FSR Countdown Bar"],
-			set = "ShowFSRBar",
-			get = function() return addon.db.char.showFSRBar end,
-			order = 31,
-			hidden = "IsHideFSRT",
-			handler = addon
-		},
+		-- showFSRB = {
+		-- 	type = "toggle",
+		-- 	name = L["FSR Countdown Bar"],
+		-- 	desc = L["FSR Countdown Bar"],
+		-- 	set = "ShowFSRBar",
+		-- 	get = function() return addon.db.char.showFSRBar end,
+		-- 	order = 31,
+		-- 	hidden = "IsHideFSRT",
+		-- 	handler = addon
+		-- },
 		showOtherFSRB = {
 			type = "toggle",
 			name = L["FSR Movable Countdown Bar"],
@@ -268,24 +234,7 @@ addon.optionsTable = {
 	},	
 }
 
-addon.db = LibStub("AceDB-3.0"):New("RegenDB", {  
-	profile = {
-		showHP = true,
-		showCurrent = false,
-		showPercent = false, 
-		showFightRegen = false, 
-		hideLabel = false,
-		-- debug = true
-	},
-	char = {
-		mpi = 1.0/15,
-		icr = 0,    
-		showOtherFSRBar = false,
-	},
-	class = {
-		mps = 0.0,
-	} 
-}, true)
+
 
 	-- Methods
 function addon:IsShowHP()
@@ -419,32 +368,38 @@ end
 function addon:SetShowOtherFSRBar(val)
 	self.db.char.showOtherFSRBar = val
 
-	addonFiveSec:ToggleActive(val)
+	if val then
+		addonFiveSec:Enable()
+	else
+		addonFiveSec:Disable()
+	end
+end
+
+function addon:StartFSRBar()
+	if self.bar then self.bar:Stop() end
+
+	if true then return end
+
+	if not self.db.char.showFSRBar then return end
+
+	self.bar = candybar:New(barTextures["smooth"], 100, 16)
+	self.bar:SetColor(0,0,1)
+	self.bar:SetDuration(5)
+	self.bar:Start()
+	self.bar:SetPoint("CENTER")
+
+	self:Debug("Started FSRBar")
 end
 
 function addon:ShowFSRBar(val)
-	-- local n,l = L["FSR"], L["FSR"]
-	-- local c = "blue"
-	-- local a = 0.8
-	-- local t = barTextures["smooth"]
-
-	-- self.db.char.showFSRBar = val
+	self.db.char.showFSRBar = val
 	
-	-- if (val) then
-	-- 	self:RegisterCandyBar(n, 5, l, barIcon, c) 
-	-- 	self:SetCandyBarTexture(n, t)
-	-- 	-- bwf = self:GetFrame()
-	-- 	self:SetCandyBarWidth(n, bwf:GetWidth()) 
-	-- 	if bwf:GetBottom() > 0 then 
-	-- 		self:SetCandyBarPoint(n, "TOPLEFT", bwf, "BOTTOMLEFT")
-	-- 	else
-	-- 		self:SetCandyBarPoint(n, "BOTTOMLEFT", bwf, "TOPLEFT")
-	-- 	end
-					
-	-- else
-	-- 	self:StopCandyBar(n)
-	-- 	self:UnregisterCandyBar(n)
-	-- end 	
+	if (val) then
+	elseif self.bar then 
+		self.bar:Stop()
+	end 	
+
+	self:Debug("FSRBar", val)
 end
 
 
@@ -453,7 +408,30 @@ addon.OnMenuRequest = addon.optionsTable
 
 	
 function addon:OnInitialize()
+	addon.db = LibStub("AceDB-3.0"):New("RegenDB", {  
+		profile = {
+			showHP = true,
+			showCurrent = false,
+			showPercent = false, 
+			showFightRegen = false, 
+			hideLabel = false,
+			debug = false
+		},
+		char = {
+			mpi = 1.0/15,
+			icr = 0,    
+			showOtherFSRBar = false,
+		},
+		class = {
+			mps = 0.0,
+		} 
+	}, true)
+
 	self:SetDebugging(self.db.profile.debug)
+
+--@debug@ 
+    self:SetDebugging(true)
+--@end-debug@   
 	
 	-- self:RegisterChatCommand( L["AceConsole-commands"], addon.optionsTable )
 	local acreg = LibStub("AceConfigRegistry-3.0")
@@ -567,7 +545,7 @@ function addon:PLAYER_REGEN_ENABLED()
 end
 
 function addon:UNIT_POWER_UPDATE(_, unit, type)
-	self:Debug("UNIT_POWER_UPDATE - "..unit.." "..type)
+	-- self:Debug("UNIT_POWER_UPDATE - "..unit.." "..type)
 	if type == "MANA" then 
 		self:UNIT_MANA(unit)
 	elseif type == "HEALTH" then
@@ -602,7 +580,7 @@ local function UnitMana(unit)
 end
 
 function addon:UNIT_MANA(unit)
-	self:Debug("UNIT_MANA - "..unit)
+	-- self:Debug("UNIT_MANA - "..unit)
 	if ( unit == "player" ) and ( UnitPowerType("player") == 0 ) then
 		if self:IsShowMP() or self:IsShowFSRT() then
 			local currMana = UnitMana("player");
@@ -621,13 +599,7 @@ function addon:UNIT_MANA(unit)
 				end	 
 			else
 				self.vars.timeTillRegen = 5;
-				if self:IsCandyBarRegistered(L["FSR"]) then
-					local bwf = self:GetFrame()
-					self:SetCandyBarWidth(L["FSR"], bwf:GetWidth()) 
-					self:StartCandyBar(L["FSR"], false) 
-				end
---			self.vars.regenMP = 0;
-	
+				self:StartFSRBar()
 				if (self.vars.regenCombatTrack == 1) then
 					self.vars.usedMPDuringCombat = self.vars.usedMPDuringCombat + currMana - self.vars.currMana;
 				end
@@ -783,15 +755,15 @@ function addon:OnTextUpdate()
     	end
 	self:SetText(labelTextHP..valueTextHP.." "..labelTextMP..valueTextMP.." "..labelTextFSRT..valueTextFSRT);
 	
-	if self:IsCandyBarRegistered(L["FSR"]) then
-		local bwf = self:GetFrame()
-		self:SetCandyBarWidth(L["FSR"], bwf:GetWidth()) 
-		self:Debug(bwf:GetBottom(), GetScreenHeight())
-		if bwf:GetBottom() > 0 then 
-			self:SetCandyBarPoint(L["FSR"], "TOPLEFT", bwf, "BOTTOMLEFT")
-		else
-			self:SetCandyBarPoint(L["FSR"], "BOTTOMLEFT", bwf, "TOPLEFT")
-		end
+	if self.bar then -- move the FSR Bar out of the way
+		-- local bwf = self:GetFrame()
+		-- self:SetCandyBarWidth(L["FSR"], bwf:GetWidth()) 
+		-- self:Debug(bwf:GetBottom(), GetScreenHeight())
+		-- if bwf:GetBottom() > 0 then 
+		-- 	self:SetCandyBarPoint(L["FSR"], "TOPLEFT", bwf, "BOTTOMLEFT")
+		-- else
+		-- 	self:SetCandyBarPoint(L["FSR"], "BOTTOMLEFT", bwf, "TOPLEFT")
+		-- end
 	end	
 end
 	

@@ -20,4 +20,5 @@ locale.lua
 
 localizations\en-US.lua
 
+fsrbar.lua
 addon.lua
