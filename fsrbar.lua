@@ -8,8 +8,8 @@ local L = Regen.L
 Regen.FSRBar = addon
 
 local regenBarName = "regenFiveSecBar"
-local regenBarIcon = "Interface\\Addons\\FuBar_regen\\textures\\5.tga"
-local regenBarTextures = { smooth = "Interface\\Addons\\FuBar_regen\\textures\\smooth.tga" }
+local regenBarIcon = "Interface\\Addons\\Regen\\textures\\5.tga"
+local regenBarTextures = { smooth = "Interface\\Addons\\Regen\\textures\\smooth.tga" }
 
 local regenBarDefaultX = -1
 local regenBarDefaultY = -1
@@ -292,6 +292,7 @@ function addon:StartFSRBar()
 	self.bar:SetColor(0,0,1)
 	self.bar:SetDuration(5)
 	self.bar:SetPoint("CENTER", self.AnchorFrame, "CENTER")
+
 	self.bar:Start()
 
 	self:Debug("Started FSRBar")
