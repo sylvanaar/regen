@@ -473,6 +473,7 @@ end
 
 function addon:OnEnable()
 	self:RegisterEvent("UNIT_POWER_UPDATE");
+	self:RegisterEvent("UNIT_HEALTH");
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("PLAYER_REGEN_DISABLED");
 	self:RegisterEvent("PLAYER_REGEN_ENABLED");
@@ -545,11 +546,9 @@ function addon:PLAYER_REGEN_ENABLED()
 end
 
 function addon:UNIT_POWER_UPDATE(_, unit, type)
-	-- self:Debug("UNIT_POWER_UPDATE - "..unit.." "..type)
+	self:Debug("UNIT_POWER_UPDATE - "..unit.." "..type)
 	if type == "MANA" then 
 		self:UNIT_MANA(unit)
-	elseif type == "HEALTH" then
-		self:UNIT_HEALTH(unit)
 	end  
 end
 
