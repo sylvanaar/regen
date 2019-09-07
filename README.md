@@ -2,7 +2,7 @@
 ![License](https://img.shields.io/github/license/sylvanaar/regen)
 
 # regen
-Mana Regeneration Information Addon
+Mana & Health Regeneration Information Addon
 
 ![Tooltip Image](https://i.imgur.com/tmUYKw0.jpg)
 
