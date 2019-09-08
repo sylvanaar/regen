@@ -40,8 +40,8 @@ L:AddLocale("enUS", {
     ["(Last Fight)"]    = true,
 
     ["Total Regen Time Observed"]        = true,
-    ["% Of That Time In FSR"] = true,
-    ["Spirit Needed To Equal 1mp5"]         = true,
+	["% Of That Time In FSR"] = true,
+	["Spirit Needed To Equal 1mp5"]         = true,
     ["Int Needed To Equal 1mp5"]        = true,
 
     ["FSR Countdown Bar"] = true,

@@ -3,19 +3,19 @@ local Regen = select(2, ...)
 local function AddLocale(L, name, loc)
     if GetLocale() == name or name == "enUS" then
       for k,v in pairs(loc) do
-          if type(v) == "table" then
-            ---
-          elseif v == true then
-            L[k] = k
-          else
-            L[k] = v
+          if not (type(v) == "table") then
+            if v == true then
+              L[k] = k
+            else
+              L[k] = v
+            end
           end
         end
       end
     end
 
 local loc_mt = {
-    __index = function(t, k)
+    __index = function(_, k)
     error("Locale key " .. tostring(k) .. " is not provided.")
     end
 }
@@ -26,4 +26,3 @@ local function GetLocalizer(locs)
 end
 
 Regen.L = GetLocalizer({})
-
