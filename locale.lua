@@ -13,7 +13,7 @@ local function AddLocale(L, name, loc)
         end
       end
     end
-  
+
 local loc_mt = {
     __index = function(t, k)
     error("Locale key " .. tostring(k) .. " is not provided.")

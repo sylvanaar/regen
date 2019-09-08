@@ -1,14 +1,14 @@
-Regen = select(2, ...)
+local Regen = select(2, ...)
 
 local addon = LibStub("AceAddon-3.0"):NewAddon("FSRBar", "AceConsole-3.0", "AceTimer-3.0", "AceHook-3.0", "AceEvent-3.0")
 local candybar = LibStub("LibCandyBar-3.0")
 
-local L = Regen.L
+-- local L = Regen.L
 
 Regen.FSRBar = addon
 
-local regenBarName = "regenFiveSecBar"
-local regenBarIcon = "Interface\\Addons\\Regen\\textures\\5.tga"
+-- local regenBarName = "regenFiveSecBar"
+-- local regenBarIcon = "Interface\\Addons\\Regen\\textures\\5.tga"
 local regenBarTextures = { smooth = "Interface\\Addons\\Regen\\textures\\smooth.tga" }
 
 local regenBarDefaultX = -1
@@ -24,8 +24,8 @@ end
 -- OnInitialize / OnEnable --
 -----------------------------
 
-function addon:OnInitialize()	
-    addon.db = LibStub("AceDB-3.0"):New("RegenFSRDB", {  
+function addon:OnInitialize()
+    addon.db = LibStub("AceDB-3.0"):New("RegenFSRDB", {
         profile = {
             locked = false,
             anchor = {
@@ -83,33 +83,33 @@ function addon:OnInitialize()
 			}
 		}
 	}
-	
+
 	--self:RegisterChatCommand({ "/nfs", "/nfivesec", "/regenFiveSec", "/fs", "/fivesec" }, self.options )
 end
 
-local function barstopped( callback, bar )
+local function barstopped( _, bar )
 	if addon.bar == bar then
 		addon:Debug("Destroying FSRBar")
 		addon.bar = nil
 	end
 end
-  
+
 candybar.RegisterCallback(addon, "LibCandyBar_Stop", barstopped)
 
 function addon:OnEnable()
     self:CreateAnchorFrame()
-    
+
 	self.AnchorFrame:Show()
 	self:LoadAnchorPosition()
 	self:SetAnchorStyle(self.db.profile.locked)
-	
+
 	self:RegisterEvent("UNIT_POWER_UPDATE")
-    
---@debug@ 
+
+--@debug@
     self:SetDebugging(true)
---@end-debug@    
+--@end-debug@
     self:Debug("OnEnable.Processed")
-    
+
     self.currMana = UnitMana("player")
 end
 
@@ -143,10 +143,10 @@ end
 
 function addon:resetFSB()
 	self.db.profile.anchor.x = regenBarDefaultX
-	self.db.profile.anchor.y = regenBarDefaultY 
+	self.db.profile.anchor.y = regenBarDefaultY
 	self.db.profile.size.width = regenBarDefaultWidth
 	self.db.profile.size.height = regenBarDefaultHeight
-	
+
 	self:LoadAnchorPosition()
 	self:UpdateSize()
 end
@@ -175,7 +175,7 @@ function addon:Debug(...)
 	end
 end
 
-function addon:SetDebugging(val) 
+function addon:SetDebugging(val)
 	addon.debug = val
 end
 
@@ -191,21 +191,21 @@ end
 ----------------------------
 
 function addon:CreateAnchorFrame()
-	if regenFiveSecAnchor then 
+	if regenFiveSecAnchor then
 		self.AnchorFrame = regenFiveSecAnchor
 		return
 	end
-	
+
 	self.AnchorFrame = CreateFrame("Frame","RegenFiveSecAnchor",UIParent)
 	self.AnchorFrame:SetWidth(self.db.profile.size.width + self.db.profile.size.height)
 	self.AnchorFrame:SetHeight(self.db.profile.size.height)
 	self.AnchorFrame:SetFrameStrata("BACKGROUND")
 	self.AnchorFrame:SetClampedToScreen(true)
-	
-	self.AnchorFrame:SetScript("OnMouseDown",	function(this) 
-													if not self.db.profile.locked then 
-														this:StartMoving() 
-													end 
+
+	self.AnchorFrame:SetScript("OnMouseDown",	function(this)
+													if not self.db.profile.locked then
+														this:StartMoving()
+													end
 												end )
 
 	self.AnchorFrame:SetScript("OnMouseUp",	function(this)
@@ -214,8 +214,8 @@ function addon:CreateAnchorFrame()
 													self:SaveAnchorPosition(this)
 												end
 											end )
-											
-	local gameFont, _, _ = GameFontHighlightSmall:GetFont()										
+
+	local gameFont, _, _ = GameFontHighlightSmall:GetFont()
 	self.AnchorFrame.Range = self.AnchorFrame:CreateFontString("AnchorBarName", "OVERLAY")
 	self.AnchorFrame.Range:SetJustifyH("CENTER")
 	self.AnchorFrame.Range:SetFont(gameFont, 12)
@@ -223,7 +223,7 @@ function addon:CreateAnchorFrame()
 	self.AnchorFrame.Range:SetText("FiveSec Bar")
 	self.AnchorFrame.Range:ClearAllPoints()
 	self.AnchorFrame.Range:SetPoint("BOTTOM", self.AnchorFrame, "TOP", 0, 2)
-							
+
 
 end
 
@@ -231,7 +231,7 @@ end
 function addon:SaveAnchorPosition(this)
 	self.db.profile.anchor.x = floor(this:GetLeft() * self.AnchorFrame:GetEffectiveScale() + .5)
 	self.db.profile.anchor.y = floor(this:GetTop() * self.AnchorFrame:GetEffectiveScale() + .5)
-	
+
 	self:Debug("SaveAnchorPosition: x=", self.db.profile.anchor.x, ", y=", self.db.profile.anchor.y)
 end
 
@@ -244,7 +244,7 @@ function addon:LoadAnchorPosition()
 	else
 		self.AnchorFrame:SetPoint("CENTER", UIParent, "CENTER")
 	end
-	
+
 	self:Debug(
 		"LoadAnchorPosition: x=", floor(self.db.profile.anchor.x/self.AnchorFrame:GetEffectiveScale() + .5),
 		", y=", floor(self.db.profile.anchor.y/self.AnchorFrame:GetEffectiveScale() + .5),
@@ -258,22 +258,22 @@ function addon:SetAnchorStyle(locked)
 	if locked then
 		self.AnchorFrame:EnableMouse(false)
 		self.AnchorFrame:SetMovable(false)
-		
+
 		self.AnchorFrame:SetBackdrop(nil)
 		self.AnchorFrame:SetBackdropBorderColor(nil)
 		self.AnchorFrame:SetBackdropColor(nil)
-		
+
 		self.AnchorFrame.Range:Hide()
 	else
 		self.AnchorFrame:EnableMouse(true)
 		self.AnchorFrame:SetMovable(true)
-		
+
 		self.AnchorFrame:SetBackdrop({
 			bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 8,
 		})
 		self.AnchorFrame:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b)
 		self.AnchorFrame:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b)
-		
+
 		self.AnchorFrame.Range:Show()
 	end
 end
@@ -300,9 +300,9 @@ end
 
 function addon:UNIT_POWER_UPDATE(_, unit, type)
 	-- self:Debug("UNIT_POWER_UPDATE - "..unit.." "..type)
-	if type == "MANA" then 
+	if type == "MANA" then
 		self:UNIT_MANA(unit)
-	end  
+	end
 end
 
 function addon:UNIT_MANA(unit)

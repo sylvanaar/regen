@@ -3,7 +3,7 @@
 ## X-Curse-Project-ID: 338912
 ## X-WoWI-ID: 25198
 
-## Title: Regen 
+## Title: Regen
 ## Notes: A tool for tracking regen (mana and hp)
 ## Version: @project-version@
 ## Author: Sylvanaar (Sylvaann - Proudmoore/US-Alliance)
